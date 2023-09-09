@@ -137,7 +137,8 @@ func (book *CiyuanjiClient) pkcs5Padding(ciphertext []byte, blockSize int) []byt
 	return append(ciphertext, padtext...)
 }
 
-func (book *CiyuanjiClient) signParam(signStr string) string {
+func (book *CiyuanjiClient) signParam(param, requestId, timestamp string) string {
+	signStr := "param=" + param + "&requestId=" + requestId + "&timestamp=" + timestamp + "&key=" + book.paramKey
 	return strings.ToUpper(string(book.encodeHex(book.byteMd5(book.byteBase64([]byte(signStr))))))
 }
 
@@ -156,7 +157,7 @@ func (book *CiyuanjiClient) param(params map[string]any) map[string]string {
 	m := map[string]string{
 		"timestamp": strconv.FormatInt(timestamp, 10),
 		"requestId": requestId,
-		"sign":      book.signParam("param=" + encryptParamInfo + "&requestId=" + requestId + "&timestamp=" + strconv.FormatInt(timestamp, 10) + "&key=" + book.paramKey),
+		"sign":      book.signParam(encryptParamInfo, requestId, strconv.FormatInt(timestamp, 10)),
 		"param":     encryptParamInfo,
 	}
 	return m
